@@ -1,0 +1,81 @@
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+}
+
+body::-webkit-scrollbar {
+    display: none; /*hiding scrollbar for Chrome*/
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+.fake-header {
+    padding: 10px 30px;
+    border-bottom: 1px black solid;
+    justify-content: space-between;
+}
+
+.phone-number {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.plusMinusBtn {
+    width: 40px;
+    border-radius: 15px;
+    font-size: 1.2rem;
+    background: none;
+    border: none;
+    height: 1rem;
+    padding-bottom: 2rem;
+}
+
+.plusMinusBtn:hover {
+    background-color: antiquewhite;
+}
+
+.cartItemsButtons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.cartItemsButtons > div {
+    border-radius: 40px 40px;
+    width: 80px;
+    display: flex;
+    flex-direction: row;
+    background: red;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+@media screen and (max-width: 300px) {
+    #gallery {
+        flex-direction: revert;
+    }
+}
+.productImage {
+    height: 180px;
+    object-fit:contain;
+}
+
+.carouselImg{
+    height: 25rem;
+    border-radius: 35px 35px;
+}

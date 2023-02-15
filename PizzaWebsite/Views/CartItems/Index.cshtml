@@ -1,0 +1,85 @@
+﻿@model IEnumerable<PizzaWebsite.Models.CartItem>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="text-center py-3">Order confirmation</h1>
+
+<div class="row flex-column-reverse flex-lg-row align-content-center" id="gallery">
+    <div class="col-md-9 order-md-1" style="padding: 0 20px">
+        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Fugit ex dignissimos temporibus rerum veritatis amet, cupiditate voluptatum tempora aliquam modi ratione quasi ut aut explicabo tempore. Minus dolorem autem magni dicta aliquid ea officia maiores laboriosam dolore ullam. Repudiandae atque dignissimos iusto distinctio tempora fuga perspiciatis consectetur pariatur porro. Blanditiis id suscipit, rerum nostrum in autem, alias provident magni similique exercitationem omnis cum, est porro! Ducimus rerum ut distinctio repudiandae excepturi fugit eos veritatis sapiente tempora magni libero nesciunt, commodi doloribus fugiat qui maiores itaque esse reiciendis similique suscipit. Sunt in, deleniti expedita laudantium iure eius vel consequuntur ipsa quos!
+    </div>    
+
+    <div class="col-lg-3 order-md-2" style="padding: 0 20px">
+        <div class="row">
+            @foreach (var item in Model.Where(x => x.ApplicationUser.UserName == User.Identity.Name))
+            {
+                <div class="col-xxl-12 p-2" >
+                    <div class="card" style="width: 100%;">
+                        <img src="~/@item.Product.Image" class="card-img-left productImage" alt=".">
+                        <div class="card-body text-center">
+                            <input type="hidden" class="productId" value="@item.Product.Id">
+                            <h6 class="card-title">@item.Product.Name</h6>
+                            <div class="cartItemsButtons">
+                                <h5>@((@item.Product.Price * @item.Quantity).ToString("0.##")) UAH</h5>
+                                <div>
+                                    <button class="plusMinusBtn minusBtn"> - </button>
+                                    @item.Quantity
+                                    <button class="plusMinusBtn plusBtn"> + </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(() => {
+
+            // adding products to cart
+            $('.plusBtn').click((event) => {
+                let target = $(event.target);
+                let parent = target.parent().parent().parent();
+                let hidden = parent.find('.productId');
+                let pid = parseInt(hidden.val());
+                $.ajax({
+                    type: 'POST',
+                    url: '/CartItems/AddProductToCart',
+                    data: { productId: pid },
+                    dataType: 'json',
+                    success: function (result) {
+                        $('#count').html(result.count);
+                        $('#amount').html(result.amount);
+                        location.reload();
+                    }
+                });
+            });
+
+            // removing product from cart
+            $('.minusBtn').click((event) => {
+                let target = $(event.target);
+                let parent = target.parent().parent().parent();
+                let hidden = parent.find('.productId');
+                let pid = parseInt(hidden.val());
+                $.ajax({
+                    type: 'POST',
+                    url: '/CartItems/DelProductFromCart',
+                    data: { productId: pid },
+                    dataType: 'json',
+                    success: function (result) {
+                        $('#count').html(result.count);
+                        $('#amount').html(result.amount);
+                        location.reload();
+                    }
+                });
+            });
+        });
+
+    </script>
+}

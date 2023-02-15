@@ -1,0 +1,64 @@
+﻿@model IEnumerable<PizzaWebsite.Models.Drink>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (User.Identity.Name == "admin1234@ukr.net")
+{
+    <p class="text-center">
+        <a asp-action="Create">Create New</a>
+    </p>
+}
+
+
+<div class="row" id="gallery">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-3">
+            <div class="card" style="width: 100%; margin-bottom: 10px;">
+                <img src="~/@item.Image" class="card-img-top productImage">
+                <div class="card-body text-center">
+                    <input type="hidden" class="productId" value="@item.Id">
+                    <h5 class="card-title">@item.Name, @item.Volume ml</h5>
+                    <h6>@item.Price.ToString("0.##") UAH</h6>
+                    <div>
+                        <button class="addToCart btn btn-sm btn-success">Add to cart</button>
+                        @if (User.Identity.Name == "admin1234@ukr.net")
+                        {
+                            <a class="btn btn-danger" asp-controller="Drinks" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                            <a class="btn btn-warning" asp-controller="Drinks" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(() => {
+
+            // adding products to cart
+            $('.addToCart').click((event) => {
+                let target = $(event.target);
+                let parent = target.parent().parent();
+                let hidden = parent.find('.productId');
+                let pid = parseInt(hidden.val());
+                $.ajax({
+                    type: 'POST',
+                    url: '/CartItems/AddProductToCart',
+                    data: { productId: pid },
+                    dataType: 'json',
+                    success: function (result) {
+                        $('#count').html(result.count);
+                        $('#amount').html(result.amount);
+                    }
+                });
+            });
+        });
+
+    </script>
+}

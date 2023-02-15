@@ -1,0 +1,73 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    IEnumerable<Pizza> pizzas = ViewData["Pizzas"] as IEnumerable<Pizza>;
+    string pizzaToppings = "";
+}
+
+<div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+    </div>
+    <div class="carousel-inner">
+        <div class="carousel-item active" data-bs-interval="5000">
+            <img src="~/Images/discount_1.jpg" class="d-block w-100 carouselImg" alt="First Slide">
+        </div>
+        <div class="carousel-item" data-bs-interval="5000">
+            <img src="~/Images/discount_2.jpg" class="d-block w-100 carouselImg" alt="Second Slide">
+        </div>
+        <div class="carousel-item" data-bs-interval="5000">
+            <img src="~/Images/discount_3.jpg" class="d-block w-100 carouselImg" alt="Third Slide">
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+
+<div class="text-center p-3">
+    <h3 class="my-4">Our best pizzas:</h3>
+    <div class="row d-flex justify-content-around" id="gallery">
+        @foreach (var item in pizzas)
+        {
+            <div class="col-md-3">
+                <div class="card" style="width: 100%; margin-bottom: 10px;">
+                    <img src="~/@item.Image" class="card-img-top productImage" alt=".">
+                    <div class="card-body text-center">
+                        <input type="hidden" class="productId" value="@item.Id">
+                        <h5 class="card-title">@item.Name, @item.Weight g</h5>
+                        <div class="card-text" style="min-height: 50px; vertical-align: middle;">
+                            @{
+                                int count = item.Toppings.Count;
+                                int c = 0;
+                                foreach (var topping in item.Toppings)
+                                {
+                                    if (c < count - 1)
+                                        pizzaToppings += topping.Name + ", ";
+                                    else
+                                        pizzaToppings += topping.Name;
+                                    c++;
+                                }
+                            }
+                            @pizzaToppings
+                            @{
+                                pizzaToppings = "";
+                            }
+                        </div>
+                        <h6>@item.Price.ToString("0.##") UAH</h6>
+                        <div>
+                            <button class="addToCart btn btn-sm btn-success">Add to cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
