@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -17,6 +18,47 @@ namespace PizzaWebsite.Controllers
         public OrdersController(ApplicationDbContext context)
         {
             _context = context;
+        }
+
+
+        [HttpPost]
+        public async Task<ActionResult> CreateOrder(string personName, string phoneNo, string email, string address)
+        {
+            var userCartItems = await _context.CartItems
+                .Include(x => x.ApplicationUser)
+                .Include(x => x.Product)
+                .Where(x => x.ApplicationUser.UserName == User.Identity.Name && x.IsOrderCheckedOut == false).ToListAsync();
+            decimal total = 0.0M;
+            foreach (var cartItem in userCartItems)
+            {
+                total += cartItem.Quantity * cartItem.Product.Price;
+                cartItem.IsOrderCheckedOut = true;
+                _context.Entry(cartItem).State = EntityState.Modified;
+            }
+            string orderNumber = (DateTime.Now.DayOfWeek.ToString().Substring(0, 1) + DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString() + DateTime.Now.Millisecond.ToString());
+            try
+            {
+                _context.Orders.Add(new Order()
+                {
+                    Id = 0,
+                    OrderNumber = orderNumber,
+                    OrderDate = DateTime.UtcNow.ToLocalTime(),
+                    PersonName = personName,
+                    PhoneNo = phoneNo,
+                    Address = address,
+                    Email = email,
+                    TotalPrice = total,
+                    CartItems = userCartItems,
+                    UserId = userCartItems[0].UserId
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok();
         }
 
         // GET: Orders
@@ -57,7 +99,7 @@ namespace PizzaWebsite.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,OrderNumber,TotalPrice,UserId")] Order order)
+        public async Task<IActionResult> Create([Bind("Id,OrderNumber,TotalPrice,PersonName,PhoneNo,Email,Address,OrderDate,UserId")] Order order)
         {
             if (ModelState.IsValid)
             {
@@ -91,7 +133,7 @@ namespace PizzaWebsite.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,OrderNumber,TotalPrice,UserId")] Order order)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,OrderNumber,TotalPrice,PersonName,PhoneNo,Email,Address,OrderDate,UserId")] Order order)
         {
             if (id != order.Id)
             {
@@ -153,6 +195,11 @@ namespace PizzaWebsite.Controllers
             var order = await _context.Orders.FindAsync(id);
             if (order != null)
             {
+                var orderCartItems = await _context.CartItems.Where(x => x.OrderId == id).ToListAsync();
+                foreach(var item in orderCartItems)
+                {
+                    _context.CartItems.Remove(item);
+                }
                 _context.Orders.Remove(order);
             }
             

@@ -3,40 +3,103 @@
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    <link href="@Url.Content("~/css/order.css")" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    decimal total = 0.0M;
 }
 
-<h1 class="text-center py-3">Order confirmation</h1>
+@if (Model.Where(x => x.ApplicationUser.UserName == User.Identity.Name && x.IsOrderCheckedOut == false).Any())
+{
+    <h1 class="text-center py-3">Order confirmation</h1>
+    <div class="row flex-column-reverse flex-lg-row align-content-center" id="gallery">
+        <div class="col-md-9 order-md-1" style="padding: 0 20px">
+            <div class="row rowOrder">
+                <div class="col-75">
+                    <div class="container orderContainer">
+                        <div class="container">
+                            <div class="row rowOrder">
+                                <div class="col-50">
+                                    <h3>Client information</h3>
+                                    @* ------------------------------------------------------*@
+                                    <label for="fname"><i class="fa fa-user"></i> Full Name</label>
+                                    <input type="text" id="fname" name="firstname" placeholder="John M. Doe">
+                                    <label for="phone"><i class="fa fa-phone"></i> Phone</label>
+                                    <input type="text" id="phone" name="phone" placeholder="+123-456-78-90">
+                                    <label for="email"><i class="fa fa-envelope"></i> Email</label>
+                                    <input type="text" id="email" name="email" placeholder="john@example.com">
+                                    <label for="adr"><i class="fa fa-address-card-o"></i> Delivery Address</label>
+                                    <input type="text" id="adr" name="address" placeholder="542 W. 15th Street">
 
-<div class="row flex-column-reverse flex-lg-row align-content-center" id="gallery">
-    <div class="col-md-9 order-md-1" style="padding: 0 20px">
-        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Fugit ex dignissimos temporibus rerum veritatis amet, cupiditate voluptatum tempora aliquam modi ratione quasi ut aut explicabo tempore. Minus dolorem autem magni dicta aliquid ea officia maiores laboriosam dolore ullam. Repudiandae atque dignissimos iusto distinctio tempora fuga perspiciatis consectetur pariatur porro. Blanditiis id suscipit, rerum nostrum in autem, alias provident magni similique exercitationem omnis cum, est porro! Ducimus rerum ut distinctio repudiandae excepturi fugit eos veritatis sapiente tempora magni libero nesciunt, commodi doloribus fugiat qui maiores itaque esse reiciendis similique suscipit. Sunt in, deleniti expedita laudantium iure eius vel consequuntur ipsa quos!
-    </div>    
+                                </div>
 
-    <div class="col-lg-3 order-md-2" style="padding: 0 20px">
-        <div class="row">
-            @foreach (var item in Model.Where(x => x.ApplicationUser.UserName == User.Identity.Name))
-            {
-                <div class="col-xxl-12 p-2" >
-                    <div class="card" style="width: 100%;">
-                        <img src="~/@item.Product.Image" class="card-img-left productImage" alt=".">
-                        <div class="card-body text-center">
-                            <input type="hidden" class="productId" value="@item.Product.Id">
-                            <h6 class="card-title">@item.Product.Name</h6>
-                            <div class="cartItemsButtons">
-                                <h5>@((@item.Product.Price * @item.Quantity).ToString("0.##")) UAH</h5>
-                                <div>
-                                    <button class="plusMinusBtn minusBtn"> - </button>
-                                    @item.Quantity
-                                    <button class="plusMinusBtn plusBtn"> + </button>
+                                <div class="col-50">
+                                    <h3>Payment</h3>
+                                    <label for="fname">Accepted Cards</label>
+                                    <div class="icon-container">
+                                        <i class="fa fa-cc-visa" style="color:navy;"></i>
+                                        <i class="fa fa-cc-amex" style="color:blue;"></i>
+                                        <i class="fa fa-cc-mastercard" style="color:red;"></i>
+                                        <i class="fa fa-cc-discover" style="color:orange;"></i>
+                                    </div>
+                                    <label for="cname">Name on Card</label>
+                                    <input type="text" id="cname" name="cardname" placeholder="John More Doe">
+                                    <label for="ccnum">Credit card number</label>
+                                    <input type="text" id="ccnum" name="cardnumber" placeholder="1111-2222-3333-4444">
+
+                                    <div class="row rowOrder">
+                                        <div class="col-50">
+                                            <label for="expdate">Exp Date</label>
+                                            <input type="text" id="expdate" name="expdate" placeholder="01/2025">
+                                        </div>
+                                        <div class="col-50">
+                                            <label for="cvv">CVV</label>
+                                            <input type="text" id="cvv" name="cvv" placeholder="123">
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <button id="checkout" value="Continue to checkout" class="btn checkoutBtn"> Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 order-md-2" style="padding: 0 20px">
+            <div class="row flex-column-reverse flex-lg-row">
+                @foreach (var item in Model.Where(x => x.ApplicationUser.UserName == User.Identity.Name && x.IsOrderCheckedOut == false))
+                {
+                    total += item.Product.Price * item.Quantity;
+                    <div class="col-xxl-12 p-2 order-xxl-2">
+                        <div class="card" style="width: 100%;">
+                            <img src="~/@item.Product.Image" class="card-img-left productImage" alt=".">
+                            <div class="card-body text-center">
+                                <input type="hidden" class="productId" value="@item.Product.Id">
+                                <h6 class="card-title">@item.Product.Name</h6>
+                                <div class="cartItemsButtons">
+                                    <h5>@((@item.Product.Price * @item.Quantity).ToString("0.##")) UAH</h5>
+                                    <div>
+                                        <button class="plusMinusBtn minusBtn"> - </button>
+                                        @item.Quantity
+                                        <button class="plusMinusBtn plusBtn"> + </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            }
+                }
+                <label class="text-center order-xxl-1" style="font-size: 16px; font-weight: bold; border: 1px solid silver; border-radius: 10px;">
+                    Total: @total.ToString("#.##") UAH
+                </label>
+            </div>
         </div>
     </div>
-</div>
+}
+else
+{
+    <h1 class="text-center py-3">Your cart is empty :(<br>Lets add something to it!</h1>    
+}
 
 @section scripts{
     <script>
@@ -79,6 +142,36 @@
                     }
                 });
             });
+
+            //order
+            $('#checkout').click((event) => {
+                    let target = $(".rowOrder");
+                    let pname = target.find('#fname');
+                    let phoneNum = target.find('#phone');
+                    let mail = target.find('#email');
+                    let addr = target.find('#adr');
+
+                    let pnameVal = (pname.val()).toString();
+                    let phoneVal = phoneNum.val();
+                    let mailVal = mail.val();
+                    let addrVal = addr.val();
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Orders/CreateOrder',
+                        data: { personName: pnameVal, phoneNo: phoneVal, email: mailVal, address: addrVal},
+                        dataType: 'json',
+                        statusCode: {
+                            200: function(response){
+                                alert('We received your order. Pizza will be delivered soon!');
+                                location.reload();
+                            }
+                        },
+                        fail: function(result){
+                            alert('Fail');
+                        }
+                    });
+                });
         });
 
     </script>

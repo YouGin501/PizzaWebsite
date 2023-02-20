@@ -11,6 +11,8 @@ namespace PizzaWebsite.Models
         [Required]
         public int Quantity { get; set; }
 
+        public bool IsOrderCheckedOut { get; set; } = false;
+
         public int? OrderId { get; set; }
         [ForeignKey("OrderId")]
         public virtual Order? Order { get; set; }

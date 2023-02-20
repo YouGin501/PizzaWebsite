@@ -35,7 +35,7 @@ namespace PizzaWebsite.Controllers
                 .Include(x => x.ApplicationUser)
                 .Include(x => x.Product)
                 .Include(x => x.Order)
-                .Where(x => x.ApplicationUser.UserName == User.Identity.Name && x.ProductId == productId)
+                .Where(x => x.ApplicationUser.UserName == User.Identity.Name && x.ProductId == productId && x.IsOrderCheckedOut == false)
                 .FirstAsync();
 
             if (currentUserCartItem.Quantity == 1)
@@ -52,13 +52,13 @@ namespace PizzaWebsite.Controllers
         [HttpPost]
         public async Task<StatInfo> AddProductToCart(int productId)
         {
-            var currentUser = _context.ApplicationUsers.Where(u => u.UserName == User.Identity.Name).First();
+            var currentUser = await _context.ApplicationUsers.Where(u => u.UserName == User.Identity.Name).FirstAsync();
             //err
             var currentUserCartItem = await _context.CartItems 
                 .Include(x => x.ApplicationUser)
                 .Include(x => x.Product)
                 .Include(x => x.Order)
-                .Where(x => x.ApplicationUser.UserName == User.Identity.Name && x.ProductId == productId)
+                .Where(x => x.ApplicationUser.UserName == User.Identity.Name && x.ProductId == productId && x.IsOrderCheckedOut == false)
                 .FirstOrDefaultAsync();
 
             if (currentUserCartItem == null)
@@ -93,7 +93,7 @@ namespace PizzaWebsite.Controllers
                 var currentUserCartItems = await _context.CartItems
                     .Include(x => x.ApplicationUser)
                     .Include(x => x.Product)
-                    .Where(x => x.ApplicationUser.UserName == User.Identity.Name)
+                    .Where(x => x.ApplicationUser.UserName == User.Identity.Name && x.IsOrderCheckedOut == false)
                     .ToListAsync();
 
                 foreach (var cartItem in currentUserCartItems)

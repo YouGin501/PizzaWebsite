@@ -13,6 +13,15 @@ namespace PizzaWebsite.Models
         public string OrderNumber { get; set; }
         [Column(TypeName = "money")]
         public decimal TotalPrice { get; set; }
+        [Required]
+        public string PersonName { get; set; }
+        [Required]
+        public string PhoneNo { get; set; }
+        public string? Email { get; set; }
+        [Required]
+        public string Address { get; set; }
+        [Required]
+        public DateTime OrderDate { get; set; }
 
         [Required]
         public string UserId { get; set; }
