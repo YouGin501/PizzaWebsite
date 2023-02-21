@@ -2,6 +2,7 @@
 
 @{
     IEnumerable<Topping> toppings = ViewData["Toppings"] as IEnumerable<Topping>;
+    IEnumerable<PizzaCategory> categories = ViewData["PizzaCategories"] as IEnumerable<PizzaCategory>;
     string pizzaToppings = "";
 }
 
@@ -19,45 +20,49 @@
 
 
 <div class="row" id="gallery">
-    @foreach(var item in Model)
-    {
-        <div class="col-md-3">
-            <div class="card" style="width: 100%; margin-bottom: 10px;">
-                <img src="~/@item.Image" class="card-img-top productImage" alt=".">
-                <div class="card-body text-center">
-                    <input type="hidden" class="productId" value="@item.Id">
-                    <h5 class="card-title">@item.Name, @item.Weight g</h5>
-                    <div class="card-text" style="min-height: 50px; vertical-align: middle;">
-                        @{
-                            int count = item.Toppings.Count;
-                            int c = 0;
-                            foreach (var topping in item.Toppings)
-                            {
-                                if (c < count - 1)
-                                    pizzaToppings += topping.Name + ", ";
-                                else
-                                    pizzaToppings += topping.Name;
-                                c++;
-                            }        
-                         }
-                         @pizzaToppings
-                         @{
-                             pizzaToppings = "";
-                         }
-                    </div>
-                    <h6>@item.Price.ToString("0.##") UAH</h6>
-                    <div>
-                        <button class="addToCart btn btn-sm btn-success">Add to cart</button>                        
-                        @if(User.Identity.Name == "admin1234@ukr.net")
-                        {
-                            <a class="btn btn-danger" asp-controller="Pizzas" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                            <a class="btn btn-warning" asp-controller="Pizzas" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                        }
+        @foreach(var category in categories)
+        {
+            <h2 class="text-center py-4">@category.CategoryName</h2>
+            @foreach (var item in Model.Where(x => x.PizzaCategory == category))
+            {
+                <div class="col-md-3">
+                    <div class="card" style="width: 100%; margin-bottom: 10px;">
+                        <img src="~/@item.Image" class="card-img-top productImage" alt=".">
+                        <div class="card-body text-center">
+                            <input type="hidden" class="productId" value="@item.Id">
+                            <h5 class="card-title">@item.Name, @item.Weight g</h5>
+                            <div class="card-text" style="min-height: 50px; vertical-align: middle;">
+                                @{
+                                    int count = item.Toppings.Count;
+                                    int c = 0;
+                                    foreach (var topping in item.Toppings)
+                                    {
+                                        if (c < count - 1)
+                                            pizzaToppings += topping.Name + ", ";
+                                        else
+                                            pizzaToppings += topping.Name;
+                                        c++;
+                                    }
+                                }
+                                @pizzaToppings
+                                @{
+                                    pizzaToppings = "";
+                                }
+                            </div>
+                            <h6>@item.Price.ToString("0.##") UAH</h6>
+                            <div>
+                                <button class="addToCart btn btn-sm btn-success">Add to cart</button>
+                                @if (User.Identity.Name == "admin1234@ukr.net")
+                                {
+                                    <a class="btn btn-danger" asp-controller="Pizzas" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                                    <a class="btn btn-warning" asp-controller="Pizzas" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                                }
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>  
-        </div>  
-}
+            }            
+        }
 </div>
 
 @section scripts{
@@ -78,6 +83,7 @@
                     success: function(result){
                         $('#count').html(result.count);
                         $('#amount').html(result.amount);
+                        alert("Pizza added to cart");
                     }
                 });
             });

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PizzaWebsite.Data;
 
@@ -11,9 +12,10 @@ using PizzaWebsite.Data;
 namespace PizzaWebsite.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230221145802_AddedCategoryModel")]
+    partial class AddedCategoryModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -242,7 +244,7 @@ namespace PizzaWebsite.Migrations
 
                     b.HasIndex("ToppingsId");
 
-                    b.ToTable("PizzaTopping", (string)null);
+                    b.ToTable("PizzaTopping");
                 });
 
             modelBuilder.Entity("PizzaWebsite.Models.CartItem", b =>
@@ -277,7 +279,7 @@ namespace PizzaWebsite.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("CartItems", (string)null);
+                    b.ToTable("CartItems");
                 });
 
             modelBuilder.Entity("PizzaWebsite.Models.Order", b =>
@@ -321,7 +323,7 @@ namespace PizzaWebsite.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("PizzaWebsite.Models.PizzaCategory", b =>
@@ -338,7 +340,7 @@ namespace PizzaWebsite.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PizzaCategory", (string)null);
+                    b.ToTable("PizzaCategory");
                 });
 
             modelBuilder.Entity("PizzaWebsite.Models.Product", b =>
@@ -365,7 +367,7 @@ namespace PizzaWebsite.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Product", (string)null);
+                    b.ToTable("Product");
 
                     b.HasDiscriminator<string>("ProductType").HasValue("Product");
                 });
@@ -384,7 +386,7 @@ namespace PizzaWebsite.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Toppings", (string)null);
+                    b.ToTable("Toppings");
                 });
 
             modelBuilder.Entity("PizzaWebsite.Models.ApplicationUser", b =>
@@ -412,13 +414,13 @@ namespace PizzaWebsite.Migrations
                 {
                     b.HasBaseType("PizzaWebsite.Models.Product");
 
-                    b.Property<int>("PizzaCategoryId")
+                    b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<int>("Weight")
                         .HasColumnType("int");
 
-                    b.HasIndex("PizzaCategoryId");
+                    b.HasIndex("CategoryId");
 
                     b.HasDiscriminator().HasValue("Pizza");
                 });
@@ -527,13 +529,13 @@ namespace PizzaWebsite.Migrations
 
             modelBuilder.Entity("PizzaWebsite.Models.Pizza", b =>
                 {
-                    b.HasOne("PizzaWebsite.Models.PizzaCategory", "PizzaCategory")
+                    b.HasOne("PizzaWebsite.Models.PizzaCategory", "Category")
                         .WithMany("Pizzas")
-                        .HasForeignKey("PizzaCategoryId")
+                        .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PizzaCategory");
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("PizzaWebsite.Models.Order", b =>

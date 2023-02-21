@@ -31,6 +31,9 @@ namespace PizzaWebsite.Controllers
         // GET: Pizzas
         public async Task<IActionResult> Index()
         {
+            List<PizzaCategory> categories = _context.Categories.Include(t => t.Pizzas).ToList();
+            ViewData["PizzaCategories"] = categories;
+
             var pizzas = _context.Pizzas.Include(p => p.Toppings);
             return View(await pizzas.ToListAsync());
         }
@@ -58,7 +61,6 @@ namespace PizzaWebsite.Controllers
         {
             List<Topping> toppings = _context.Toppings.Include(t => t.Pizzas).ToList();
             ViewData["Toppings"] = toppings;
-
             return View();
         }
 
@@ -67,7 +69,7 @@ namespace PizzaWebsite.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Weight,Id,Name,Price,Image,Toppings")] Pizza pizza,
+        public async Task<IActionResult> Create([Bind("Weight,Id,Name,Price,Image,Toppings,PizzaCategoryId")] Pizza pizza,
             IFormFile image, int[] Toppings)
         {
             if (ModelState.IsValid)
@@ -100,6 +102,7 @@ namespace PizzaWebsite.Controllers
             }
             List<Topping> topps = _context.Toppings.Include(t => t.Pizzas).ToList();
             ViewData["Toppings"] = topps;
+            ViewData["PizzaCategoryId"] = new SelectList(_context.Categories, "Id", "CategoryName");
             return View(pizza);
         }
 
@@ -116,8 +119,9 @@ namespace PizzaWebsite.Controllers
             {
                 return NotFound();
             }
-            List<Topping> toppings = _context.Toppings.Include(t => t.Pizzas).ToList();
-            ViewData["Toppings"] = toppings;
+            List<Topping> topps = _context.Toppings.Include(t => t.Pizzas).ToList();
+            ViewData["Toppings"] = topps;
+            ViewData["PizzaCategoryId"] = new SelectList(_context.Categories, "Id", "CategoryName");
             return View(pizza);
         }
 
@@ -126,7 +130,8 @@ namespace PizzaWebsite.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Weight,Id,Name,Price,Image,Toppings")] Pizza pizza)
+        public async Task<IActionResult> Edit(int id, [Bind("Weight,Id,Name,Price,Image,Toppings,PizzaCategoryId")] Pizza pizza,
+             int[] Toppings)
         {
             if (id != pizza.Id)
             {
@@ -137,7 +142,40 @@ namespace PizzaWebsite.Controllers
             {
                 try
                 {
-                    _context.Update(pizza);
+                    // Deleting topping from DB
+                    var pizzaToppings = await _context.Toppings.Include(t => t.Pizzas).Where(t => t.Pizzas.Contains(pizza)).ToListAsync();
+                    foreach(var topping in pizzaToppings)
+                    {
+                        topping.Pizzas.Remove(pizza);
+                        _context.Entry(topping).State = EntityState.Modified;
+                    }
+
+                    // Adding selected topping to pizza
+                    List<Topping> forPizza = new List<Topping>();
+                    var allToppings = await _context.Toppings.ToListAsync();
+                    foreach (var item in Toppings)
+                    {
+                        forPizza.Add(allToppings.First(t => t.Id == item));
+                    }
+                    pizza.Toppings = forPizza;
+
+                    // Updates an existing pizza in the database.
+                    // If it doesn't exist adds a new one, using the properties of a modified pizza object.
+                    var existingPizza = await _context.Pizzas.Include(p => p.Toppings).FirstOrDefaultAsync(p => p.Id == pizza.Id);
+                    if (existingPizza != null)
+                    {
+                        existingPizza.Name = pizza.Name;
+                        existingPizza.Price = pizza.Price;
+                        existingPizza.Weight = pizza.Weight;
+                        existingPizza.Image = pizza.Image;
+                        existingPizza.PizzaCategoryId = pizza.PizzaCategoryId;
+                        existingPizza.Toppings = pizza.Toppings;
+                        _context.Update(existingPizza);
+                    }
+                    else
+                    {
+                        _context.Update(pizza);
+                    }
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -153,8 +191,9 @@ namespace PizzaWebsite.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            List<Topping> toppings = _context.Toppings.Include(t => t.Pizzas).ToList();
-            ViewData["Toppings"] = toppings;
+            List<Topping> topps = _context.Toppings.Include(t => t.Pizzas).ToList();
+            ViewData["Toppings"] = topps;
+            ViewData["PizzaCategoryId"] = new SelectList(_context.Categories, "Id", "CategoryName");
             return View(pizza);
         }
 
