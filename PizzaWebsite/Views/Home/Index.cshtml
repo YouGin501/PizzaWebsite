@@ -42,7 +42,7 @@
                     <div class="card-body text-center">
                         <input type="hidden" class="productId" value="@item.Id">
                         <h5 class="card-title">@item.Name, @item.Weight g</h5>
-                        <div class="card-text" style="min-height: 50px; vertical-align: middle;">
+                        <div class="card-text" style="min-height: 50px; vertical-align: middle; font-size: small;">
                             @{
                                 int count = item.Toppings.Count;
                                 int c = 0;
@@ -70,4 +70,3 @@
         }
     </div>
 </div>
-

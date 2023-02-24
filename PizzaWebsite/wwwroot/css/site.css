@@ -79,3 +79,26 @@ body::-webkit-scrollbar {
     height: 25rem;
     border-radius: 35px 35px;
 }
+
+#price-sort {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 50px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.075);
+    color: #555;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    vertical-align: middle;
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    font-weight: 700;
+    width: 200px;
+    height: 40px;
+}
+
+.select-container {
+    float: right;
+    margin: 0 20px 1rem 20px;
+}

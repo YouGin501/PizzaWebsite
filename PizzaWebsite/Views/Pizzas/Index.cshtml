@@ -18,11 +18,18 @@
     </p>    
 }
 
+<div class="select-container">
+    <select id="price-sort">
+        <option value="none" selected disabled hidden>Sort</option>
+        <option value="asc">Price low to high</option>
+        <option value="desc">Price high to low</option>
+    </select>
+</div>
 
-<div class="row" id="gallery">
+<div class="row w-100" id="gallery">
         @foreach(var category in categories)
         {
-            <h2 class="text-center py-4">@category.CategoryName</h2>
+            <h2 class="categoryName text-center pb-4">@category.CategoryName</h2>
             @foreach (var item in Model.Where(x => x.PizzaCategory == category))
             {
                 <div class="col-md-3">
@@ -31,7 +38,7 @@
                         <div class="card-body text-center">
                             <input type="hidden" class="productId" value="@item.Id">
                             <h5 class="card-title">@item.Name, @item.Weight g</h5>
-                            <div class="card-text" style="min-height: 50px; vertical-align: middle;">
+                            <div class="card-text" style="min-height: 50px; vertical-align: middle; font-size: small;">
                                 @{
                                     int count = item.Toppings.Count;
                                     int c = 0;
@@ -68,26 +75,94 @@
 @section scripts{
     <script>
         $(document).ready(() =>{
+            var cartItems = [];
 
             // adding products to cart
-            $('.addToCart').click((event) =>{
+            $('.addToCart').click((event) => {
                 let target = $(event.target);
                 let parent = target.parent().parent();
                 let hidden = parent.find('.productId');
                 let pid = parseInt(hidden.val());
-                $.ajax({
-                    type: 'POST',
-                    url: '/CartItems/AddProductToCart',
-                    data: {productId: pid},
-                    dataType: 'json',
-                    success: function(result){
-                        $('#count').html(result.count);
-                        $('#amount').html(result.amount);
-                        alert("Pizza added to cart");
+
+                //$.ajax({
+                //    type: 'GET',
+                //    url: '/Home/CheckUserIsAuthenticated',
+                //    success: function(result){
+                //        if (result === true) {
+                            $.ajax({
+                                type: 'POST',
+                                url: '/CartItems/AddProductToCart',
+                                data: { productId: pid },
+                                dataType: 'json',
+                                success: function (result) {
+                                    $('#count').html(result.count);
+                                    $('#amount').html(result.amount);
+                                    alert("Pizza added to cart");
+                                }
+                            });
+                //        }
+                //        else {
+                //            var imagePath = parent.find('img').attr('src');
+                //            var title = parent.find('.card-title').text();
+                //            var price = parseFloat(parent.find('h6').text());
+
+                //            for (var i = 0; i < cartItems.length; i++) {
+                //                if (cartItems[i].productId === pid) {
+                //                    if (cartItems[i].quantity > 0) {
+                //                        cartItems[i].quantity++;
+                //                    } else {
+                //                        cartItems.push({ productId: pid, title: title, imagePath: imagePath, price: price, quantity: 1 });
+                //                    }
+                //                }
+                //            }
+                //        }
+                //    }
+                //});
+                
+            });
+
+            //$('#cartButton').click(function(){
+            //    var content = '';
+            //    $.each(cartItems, function (index, item) {
+
+            //        cartContent += '<div class="col-xxl-12 p-2 order-xxl-2">' +
+            //            '<div class="card" style="width: 100%;">' +
+            //                '<img src=item.imagePath class="card-img-left productImage" alt=".">' +
+            //                '<div class="card-body text-center">' +
+            //                    '<input type="hidden" class="productId" value=item.productId>' +
+            //                    '<h6 class="card-title">'+item.title+'</h6>' +
+            //                    '<div class="cartItemsButtons">' +
+            //                        '<h5>'+item.price+ 'UAH</h5>' +
+            //                        '<div>' +
+            //                            '<button class="plusMinusBtn minusBtn" content="-"></button>' +
+            //                            item.quantity +
+            //                            '<button class="plusMinusBtn plusBtn" content="+"></button>' +
+            //                        '</div>'+
+            //                    '</div>' +
+            //                '</div>' +
+            //            '</div>' +
+            //        '</div>';
+            //    });
+            //});
+
+            // hiding categories and sorting pizzas
+            const $priceSort = $('#price-sort');
+            const $categoryNameElements = $('.categoryName');
+            const $gallery = $('#gallery');
+            $('#price-sort').change(function () {
+                $categoryNameElements.hide();
+
+                var sortedCards = $('.col-md-3').sort(function (a, b) {
+                    var aPrice = parseFloat($(a).find('.card h6').text());
+                    var bPrice = parseFloat($(b).find('.card h6').text());
+                    if ($('#price-sort').val() == 'asc') {
+                        return aPrice - bPrice;
+                    } else if ($('#price-sort').val() == 'desc') {
+                        return bPrice - aPrice;
                     }
                 });
+                $('#gallery').empty().append(sortedCards);
             });
         });
-
     </script>
 }
