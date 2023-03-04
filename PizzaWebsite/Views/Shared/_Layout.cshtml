@@ -77,17 +77,32 @@
     <script>
         $(document).ready(() => {
             // updating cart info
+
             $.ajax({
-                type: 'POST',
-                url: '/CartItems/GetStatInfo',
-                data: {},
-                dataType: 'json',
+                type: 'GET',
+                url: '/Home/CheckUserIsAuthenticated',
                 success: function (result) {
-                    $('#count').html(result.count);
-                    $('#amount').html(result.amount);
+                    if (result === true) {
+
+                        //console.log("success2");
+
+                        $.ajax({
+                            type: 'POST',
+                            url: '/CartItems/GetStatInfo',
+                            data: {},
+                            dataType: 'json',
+                            success: function (result) {
+                                $('#count').html(result.count);
+                                $('#amount').html(result.amount);
+                            }
+                        });
+                    }
+                    else {
+                        $('#count').html();
+                        $('#amount').html(10);
+                    }
                 }
             });
-
         });
     </script>
     @await RenderSectionAsync("Scripts", required: false)

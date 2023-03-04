@@ -11,13 +11,13 @@ namespace PizzaWebsite.Controllers
         private readonly ApplicationDbContext _context;
         private readonly ILogger<HomeController> _logger;
 
-        //public bool CheckUserIsAuthenticated()
-        //{
-        //    if (User.Identity.IsAuthenticated)
-        //        return true;
-        //    else
-        //        return false;
-        //}
+        public bool CheckUserIsAuthenticated()
+        {
+            if (User.Identity.IsAuthenticated)
+                return true;
+            else
+                return false;
+        }
 
         public HomeController(ApplicationDbContext context, ILogger<HomeController> logger)
         {

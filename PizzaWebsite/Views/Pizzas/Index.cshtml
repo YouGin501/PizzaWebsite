@@ -74,8 +74,7 @@
 
 @section scripts{
     <script>
-        $(document).ready(() =>{
-            var cartItems = [];
+        $(document).ready(() => {
 
             // adding products to cart
             $('.addToCart').click((event) => {
@@ -84,11 +83,11 @@
                 let hidden = parent.find('.productId');
                 let pid = parseInt(hidden.val());
 
-                //$.ajax({
-                //    type: 'GET',
-                //    url: '/Home/CheckUserIsAuthenticated',
-                //    success: function(result){
-                //        if (result === true) {
+                $.ajax({
+                    type: 'GET',
+                    url: '/Home/CheckUserIsAuthenticated',
+                    success: function(result){
+                        if (result === true) {
                             $.ajax({
                                 type: 'POST',
                                 url: '/CartItems/AddProductToCart',
@@ -100,50 +99,41 @@
                                     alert("Pizza added to cart");
                                 }
                             });
-                //        }
-                //        else {
-                //            var imagePath = parent.find('img').attr('src');
-                //            var title = parent.find('.card-title').text();
-                //            var price = parseFloat(parent.find('h6').text());
+                        }
+                        else {
+                            //TODO Выводить Тотал на экран независимо от всего
 
-                //            for (var i = 0; i < cartItems.length; i++) {
-                //                if (cartItems[i].productId === pid) {
-                //                    if (cartItems[i].quantity > 0) {
-                //                        cartItems[i].quantity++;
-                //                    } else {
-                //                        cartItems.push({ productId: pid, title: title, imagePath: imagePath, price: price, quantity: 1 });
-                //                    }
-                //                }
-                //            }
-                //        }
-                //    }
-                //});
+                            let imagePath = parent.parent().find('.productImage').attr('src');
+                            var title = parent.find('.card-title').text();
+                            var price = parseFloat(parent.find('h6').text());
+
+                            const cartItems = JSON.parse(sessionStorage.getItem('data'));
+
+                            //alert(JSON.stringify(cartItems));
+
+                            if (cartItems !== null) {
+                                //alert("not null");
+                                const index = cartItems.findIndex(item => item.productId === pid);
+                                if (index !== -1) {
+                                    cartItems[index].quantity += 1;
+                                } else {
+                                    cartItems.push({ productId: pid, title: title, imagePath: imagePath, price: price, quantity: 1 });
+                                }
+                                sessionStorage.setItem('data', JSON.stringify(cartItems));
+                                //alert('success');
+                            }
+                            else {
+                                //alert("null");
+                                const tempArr = [];
+                                tempArr.push({ productId: pid, title: title, imagePath: imagePath, price: price, quantity: 1 });
+                                sessionStorage.setItem('data', JSON.stringify(tempArr));
+                                //alert('success');
+                            }
+                        }
+                    }
+                });
                 
             });
-
-            //$('#cartButton').click(function(){
-            //    var content = '';
-            //    $.each(cartItems, function (index, item) {
-
-            //        cartContent += '<div class="col-xxl-12 p-2 order-xxl-2">' +
-            //            '<div class="card" style="width: 100%;">' +
-            //                '<img src=item.imagePath class="card-img-left productImage" alt=".">' +
-            //                '<div class="card-body text-center">' +
-            //                    '<input type="hidden" class="productId" value=item.productId>' +
-            //                    '<h6 class="card-title">'+item.title+'</h6>' +
-            //                    '<div class="cartItemsButtons">' +
-            //                        '<h5>'+item.price+ 'UAH</h5>' +
-            //                        '<div>' +
-            //                            '<button class="plusMinusBtn minusBtn" content="-"></button>' +
-            //                            item.quantity +
-            //                            '<button class="plusMinusBtn plusBtn" content="+"></button>' +
-            //                        '</div>'+
-            //                    '</div>' +
-            //                '</div>' +
-            //            '</div>' +
-            //        '</div>';
-            //    });
-            //});
 
             // hiding categories and sorting pizzas
             const $priceSort = $('#price-sort');
