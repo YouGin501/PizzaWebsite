@@ -112,22 +112,31 @@
                             //alert(JSON.stringify(cartItems));
 
                             if (cartItems !== null) {
-                                //alert("not null");
+                                alert("not null");
+
+                                const total = JSON.parse(sessionStorage.getItem('total'));
+                                alert(JSON.stringify(total));
+
                                 const index = cartItems.findIndex(item => item.productId === pid);
                                 if (index !== -1) {
                                     cartItems[index].quantity += 1;
                                 } else {
                                     cartItems.push({ productId: pid, title: title, imagePath: imagePath, price: price, quantity: 1 });
                                 }
+                                total += total + price;
                                 sessionStorage.setItem('data', JSON.stringify(cartItems));
-                                //alert('success');
+                                sessionStorage.setItem('total', JSON.stringify(total));
+
+                                alert('success');
                             }
                             else {
-                                //alert("null");
+                                alert("null");
+
                                 const tempArr = [];
                                 tempArr.push({ productId: pid, title: title, imagePath: imagePath, price: price, quantity: 1 });
                                 sessionStorage.setItem('data', JSON.stringify(tempArr));
-                                //alert('success');
+                                sessionStorage.setItem('total', JSON.stringify(price));
+                                alert('success');
                             }
                         }
                     }
