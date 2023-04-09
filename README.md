@@ -1,6 +1,6 @@
 # PizzaWebsite
 
-Just a Pizza website pet project I decided to make for fun.
+Just a Pizza website pet project.
 
 ## Description
 
